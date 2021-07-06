@@ -1,7 +1,8 @@
-from NanoCore import vasp, vasp_old
+from NanoCore import vasp
+from NanoCore import io
 from NanoCore import catalysis     
 
-at = vasp_old.read_poscar('CONTCAR_Pt-SAC')
+at = io.read_poscar('CONTCAR_Pt-SAC')
 at2 = vasp.Vasp(at)
 
 TE, ZPE, TS = vasp.Vasp.run_series_ORR(at2, nproc=40, npar=8, mode='opt', kpoints=[5,5,1], vib=1, label='test')
