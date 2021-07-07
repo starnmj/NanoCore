@@ -26,7 +26,10 @@ class Vasp(object):
     -------------------
     """
 
-    _params = {
+
+    def __init__(self, atoms):
+        self.atoms = atoms 
+        self._params = {
               #1. Name and basic options       
                'SYSTEM'      :     'vasp',       # text, system name
                'NPAR'        :          1,       # integer, number of bands
@@ -64,9 +67,6 @@ class Vasp(object):
                'LMAXMIX'     :          4,       # Density Mixer handles quantumNumber upto (4: d-elements, 6: f-elements)
                'ISPIN'       :          2,       # 1 = Spin-restricted, 2 = spin-unrestricted
               }
-
-    def __init__(self, atoms):
-        self.atoms = atoms 
 
     def get_options(self):
         """
