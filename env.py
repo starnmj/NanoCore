@@ -1,8 +1,11 @@
 #
 # VASP
 #
+
+vaspini = '/TGM/Apps/VASP/POTCAR/'
+
 vasp_calculator = '/TGM/Apps/VASP/bin/5.4.4/O3/NORMAL/vasp.5.4.4.pl2.O3.NORMAL.std.x' 
-vasp_POTCAR_LDA  = '/home2/starnmj/bin/VASPPOT/PAW_LDA'
-vasp_POTCAR_PBE  = '/home2/starnmj/bin/VASPPOT/PAW_PBE'
-vasp_POTCAR_PW91 = '/home2/starnmj/bin/VASPPOT/PAW_PW91'
+vasp_POTCAR_LDA  = vaspini + '1.POTPAW.LDA.54.RECOMMEND'
+vasp_POTCAR_PBE  = vaspini + '2.POTPAW.PBE.54.RECOMMEND'
+vasp_POTCAR_PW91 = vaspini + '2.POTPAW.PBE.54.RECOMMEND'        # connect to correct directory
 
