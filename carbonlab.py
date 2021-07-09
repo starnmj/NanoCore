@@ -13,6 +13,7 @@
 
 from __future__ import print_function
 from . atoms import *
+import numpy as np
 
 
 def dmax(a,b):
@@ -23,7 +24,7 @@ def dmax(a,b):
         a,b = b % a,a
     return b
 
-def grp(n, m, bl=1.415):
+def grp(n, m, bl=1.415, vacuum=10.0):
     """
     Generate Graphene  
     """
@@ -33,7 +34,7 @@ def grp(n, m, bl=1.415):
     basis = [('C',0,0,0),('C',r3*bl/2,bl/2,0)]
     cell = [[    (n+1)*sqrt(3)*bl,               0,    0],
             [(m+1)*(sqrt(3)/2)*bl,(m+1)*(3./2.)*bl,    0],
-            [                 0.0,             0.0, 15.0]]
+            [                 0.0,             0.0, vacuum]]
     grp = []; i = 0
     while i <= n:
         temp = AtomsSystem(basis); temp.select_all()
@@ -48,51 +49,57 @@ def grp(n, m, bl=1.415):
         i += 1
     return AtomsSystem(grp2, cell=cell)
 
+def SC_2d(n, m, basis, uc):
+    sc_basis = []
+    sc_cell = []
+    a1 = np.array(uc[0])
+    a2 = np.array(uc[1])
+    ### make SC basis
+    for atom in basis:
+        for i in range(n):
+            for j in range(m):
+                sc_atom_xy  = np.array(atom[1:3])
+                sc_atom_xy  = sc_atom_xy + i*np.array(uc[0][:2])
+                sc_atom_xy  = sc_atom_xy + j*np.array(uc[1][:2])
+                sc_atom_basis=[atom[0]]
+                sc_atom_basis.extend(list(sc_atom_xy))
+                sc_atom_basis.append(atom[3])
+                #print(f"add atoms in sc {sc_atom_basis}")
+                sc_basis.append(tuple(sc_atom_basis))
+    ### make SC
+    cell0 = np.array(uc[0]) * n
+    cell1 = np.array(uc[1]) * m
+    sc_cell = [list(cell0), list(cell1), uc[2]]
+    return sc_basis, sc_cell
+        
+grp_hexa = grp
 
-def grp_nr(n, m, bl=1.415):
+def grp_rect(n, m, bl=1.42, vacuum=10.0, center=0.4):
     """
-    Generate Graphene nanoribbon
+    Generate Graphene as Rectangular shape 
+    bl      C-C bond length ase 1.420
+    center  location of surface between 0 and 1
     """
     from math import sqrt, asin, pi
+    a1 = 3.*bl
     r3 = sqrt(3)
-    a = bl*r3  # length of a1,a2 vector
-    r = a*sqrt(n**2+n*m+m**2)/(2*pi) # Ch vector
+    a2 = bl*r3  # length of a1,a2 vector
 
-    d=dmax(n,m)
-    c = a*sqrt(n**2+n*m+m**2)  # diameter of CNT
+    if not center:
+        z = 0
+    elif center:
+        z = vacuum * center
 
-    if (n-m)%(3*d) == 0:
-        dr = 3*d
-    elif (n-m)%(3*d) != 0:
-        dr = d
-    t=r3*c/dr  # Tube vector
+    basis = [('C',0,0,z),('C',bl,0,z),('C',3./2.*bl,r3*bl/2,z),('C',5./2.*bl,r3*bl/2,z)]
 
-    x1 = a*n + a*m/2
-    y1 = r3*m*a/2
-    x2 = -3*m*a/(2*dr)
-    y2 = (2*n+m)*r3*a/(2*dr)
-    x3 = x1 + x2
-    y3 = y1 + y2
-    i = ( x2-y2/r3, 0 )
-    unit = grp((x1-(x2-y2/r3))/a+1, y3/(r3*a/2)+1, bl)
-    unit.select_all()
-    unit.translate(i[0], i[1], 0)
-    c_ang = asin(sqrt(3)*m/(2*sqrt(n**2+n*m+m**2)))
-    unit.rotate(-c_ang*180./pi,(0,0,0),(0,0,1))
-    unit.translate(10**-12,10**-12,0)
-    unit1 = []
-    for atom in unit:
-        x,y,z = atom.get_position()
-        if y >= 0:
-            if y < t:
-                if x < c:
-                    if x >= 0:
-                        unit1.append(atom.copy())
-    nr = AtomsSystem(unit1)
-    nr.select_all(); nr.translate(-10**-12,-10**-12,0)
-    cell = [ [c,0,0], [0,t,0], [0,0,20] ]
-    nr.set_cell(cell)
-    return nr
+    cell = [[  a1, 0.0, 0],
+            [ 0.0,  a2, 0],
+            [ 0.0, 0.0, vacuum]]
+    #print(basis, cell)    
+    if n*m != 1:
+        basis, cell = SC_2d(n, m, basis, cell)
+
+    return AtomsSystem(basis, cell)
 
 def cnt(n, m, bl=1.415):
     """
@@ -121,16 +128,41 @@ def cnt(n, m, bl=1.415):
     cnt_unit.set_cell(cell)
     return cnt_unit
 
-def grp_armchair(n, m, bl=1.42, bl2 = 1.0927, passivation=1, BN=0, repeat=1):
-    #bl: C-C distance, bl2: H-C distance
-    # initalization
+def gnr_ac(n, m, bl=1.42, bl2 = 1.0927, passivation=0, symmetric=0, BN=0, repeat=1, vacuum=10.0, center=0.4):
+    '''
+    bl  C-C distance
+    bl2 H-C distance
+    n   number of chains along with x-axis which direct to z-axis
+    m   length of chain along with z-axis
+    '''
     from math import sqrt
 
-    basis1 = Atom('C', [sqrt(3)*bl/2, 0.0,    0.0])
-    basis2 = Atom('C', [         0.0, 0.0,   bl/2])
-    basis3 = Atom('C', [         0.0, 0.0, 1.5*bl])
-    basis4 = Atom('C', [sqrt(3)*bl/2, 0.0,   2*bl])
-    basis  = AtomsSystem([basis1, basis2, basis3, basis4])
+    ### obtain grephene rectangle
+    image = grp_rect(n, m, bl=bl, vacuum=vacuum, center=center)
+
+    ### add last half chain if symmetric
+    if symmetric:
+        pass
+    if passivation:
+        pass
+
+    cell = image.get_cell()
+    cell[1][1] = cell[1][1] + vacuum
+    image.set_cell(cell)
+    image.select_all()
+    image.translate(dx=0, dy=vacuum/2., dz=0)
+    
+    '''
+    basis1 = Atom('C', [ 0.0,       y,    0.0   ])
+    basis2 = Atom('C', [ 0.0,       y,    bl    ])
+    basis3 = Atom('C', [ r3*bl/2,   y,    1.5*bl])
+    basis4 = Atom('C', [ r3*bl/2,   y,    2.5*bl])
+    basis  = [basis1, basis2, basis3, basis4]
+    if n != 1:
+        
+
+    if n*m != 1:
+        basis, _ = SC_2d(n, m, basis, uc)
 
     if BN:
         basis1 = Atom('B', [sqrt(3)*bl/2, 0.0,    0.0])
@@ -150,67 +182,28 @@ def grp_armchair(n, m, bl=1.42, bl2 = 1.0927, passivation=1, BN=0, repeat=1):
         Hbasis_even = AtomsSystem([Hbasis3, Hbasis4])
 
     atoms = []
-    nn, nm = divmod(n,2)
     i_n = 0
     
-    while i_n < nn:
-        tmp = basis.copy()
-        tmp.select_all()
-        tmp.translate(sqrt(3)*bl*i_n, 0.0, 0.0)
-        for atm in tmp:
-                atoms.append(atm.copy())
-        i_n += 1
+    if passivation:
+        Htmp = Hbasis.copy()
+        Htmp.select_all()
+        atoms.append(Htmp[0].copy())
+        atoms.append(Htmp[1].copy())    
 
-    if nm:
-        tmp = AtomsSystem([basis2,basis3])
-        tmp.select_all()
-        tmp.translate(sqrt(3)*bl*i_n, 0.0, 0.0)
-        atoms.append(tmp[0].copy())
-        atoms.append(tmp[1].copy())
-        if passivation:
-            Htmp = Hbasis.copy()
-            Htmp.select_all()
-            atoms.append(Htmp[0].copy())	
-            atoms.append(Htmp[1].copy())
-	
-            Htmp2 = Hbasis.copy()
-            Htmp2.select_all()
-            Htmp2.translate(sqrt(3)*bl*i_n+sqrt(3)*bl2, 0.0, 0.0)
-            atoms.append(Htmp2[0].copy())
-            atoms.append(Htmp2[1].copy())
-    else:
-        if passivation:
-            Htmp = Hbasis.copy()
-            Htmp.select_all()
-            atoms.append(Htmp[0].copy())
-            atoms.append(Htmp[1].copy())    
+        Htmp3 = Hbasis_even.copy()
+        Htmp3.select_all()
+        Htmp3.translate(sqrt(3)*bl*(i_n-1), 0.0, 0.0)
+        atoms.append(Htmp3[0].copy())
+        atoms.append(Htmp3[1].copy())
 
-            Htmp3 = Hbasis_even.copy()
-            Htmp3.select_all()
-            Htmp3.translate(sqrt(3)*bl*(i_n-1), 0.0, 0.0)
-            atoms.append(Htmp3[0].copy())
-            atoms.append(Htmp3[1].copy())
-
-    atoms2 = []
-    i_m = 0
-    while i_m < m:
-        tmp = AtomsSystem(atoms)
-        tmp.select_all()
-        tmp.translate(0.0, i_m*(3*bl), 0.0)
-        for atm in tmp:
-            atoms2.append(atm.copy())
-        i_m += 1
-    cell = [ [20.0,  0.0,    0.0],
-             [ 0.0, 20.0,    0.0],
-             [ 0.0,  0.0, m*3*bl]]
-    atoms2 = AtomsSystem(atoms2, cell=cell) * (1, 1, repeat)
-    atoms2.select_all()
-    atoms2.sort('z')
-    atoms2.set_serials(1)
-    return atoms2
+    cell = [ [ ax,   0.0,    0.0],
+             [ 0.0,   ay,    0.0],
+             [ 0.0,  0.0,     az]]
+    '''           
+    return image
 
 
-def grp_zigzag(n,m,bl=1.42, bl2=1.0974, passivation=1, BN=0, repeat=1):
+def gnr_zigzag(n,m,bl=1.42, bl2=1.0974, passivation=1, BN=0, repeat=1, vacuum=10.0):
     from math import sqrt
     basis1 = Atom('C', [   0.0, 0.0, sqrt(3)*bl/2])
     basis2 = Atom('C', [  bl/2, 0.0,          0.0])
