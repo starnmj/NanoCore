@@ -444,14 +444,13 @@ class Vasp(object):
         else:
             pass
  
-def run_series_HER(atoms_HER, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1], 
+def run_series_HER(atoms, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1], 
                    ediff = 0.0001, ediffg = -0.05, fix=None, active=None, vib=1, label='test'):
 
     from NanoCore.catalysis import Modeling
     
-    atoms = atoms_HER.atoms
     n_atoms = len(atoms)
-    #atoms_HER = Vasp(atoms)
+    atoms_HER = Vasp(atoms)
     atoms_HER.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
                             ediff=ediff, ediffg=ediffg, fix=fix)
     
@@ -496,14 +495,13 @@ def run_series_HER(atoms_HER, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1
     else:
         return float(TE_Sys), float(TE_SysH)
 
-def run_series_ORR(ORR_Sys, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1],                
+def run_series_ORR(atoms, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1],                
                 ediff = 0.0001, ediffg = -0.05, fix=None, active=None, vib=1, label='test'):
                                                                                              
     from NanoCore.catalysis import Modeling
  
-    atoms        = ORR_Sys.atoms
     n_atoms      = len(atoms)
-    #ORR_Sys      = Vasp(S)
+    ORR_Sys      = Vasp(atoms)
     ORR_Sys.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
                          ediff=ediff, ediffg=ediffg, fix=fix)
  
