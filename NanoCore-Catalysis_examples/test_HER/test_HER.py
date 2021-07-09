@@ -5,7 +5,7 @@ from NanoCore import surflab
 at = surflab.fccsurfaces('Pt', '111', (2,2,4), vac=15)
 at2 = vasp.Vasp(at)
 
-TE_Sys, TE_SysH, ZPE, TS = vasp.Vasp.run_series_HER(at2, nproc=40, npar=8, kpoints=[4,4,1],ediffg = -0.04)
+TE_Sys, TE_SysH, ZPE, TS = vasp.run_series_HER(at2, nproc=40, npar=8, kpoints=[4,4,1],ediffg = -0.04)
 
 Gibbs_noVib = catalysis.Calculation.Gibbs_HER([TE_Sys], [TE_SysH])
 Gibbs_Vib   = catalysis.Calculation.Gibbs_HER([TE_Sys], [TE_SysH], [ZPE], [TS])

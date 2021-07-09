@@ -179,11 +179,12 @@ class Vasp(object):
     
     def write_KPOINTS(self):
         #-------------KPOINTS-------------------        
+        p = self._params
         KPOINTS = open('KPOINTS', 'w')
         KPOINTS.write("k-points\n")
         KPOINTS.write("0\n")
         KPOINTS.write("G\n")
-        KPOINTS.write("%i %i %i\n" % (self._params['KPOINTS'][0], self._params['KPOINTS'][1], self._params['KPOINTS'][2]))
+        KPOINTS.write("%i %i %i\n" % (p['KPOINTS'][0], p['KPOINTS'][1], p['KPOINTS'][2]))
         KPOINTS.write("0 0 0 \n")
         KPOINTS.close()
 
@@ -230,41 +231,42 @@ class Vasp(object):
 
     def write_INCAR(self):
         #-------------INCAR---------------------
+        p = self._params
         INCAR = open('INCAR', 'w')
         INCAR.write("# VASP general descriptors \n\n")
-        INCAR.write("SYSTEM        =   %s\n" % self._params['SYSTEM'])
-        INCAR.write("NPAR          =   %i\n" % int(self._params['NPAR']))
-        INCAR.write("IBRION        =   %i\n" % int(self._params['IBRION']))
-        INCAR.write("LWAVE         =   %s\n" % self._params['LWAVE']) 
-        INCAR.write("LCHARG        =   %s\n" % self._params['LCHARG']) 
-        INCAR.write("NSW           =   %i\n" % self._params['NSW']) 
-        INCAR.write("PREC          =   %s\n" % self._params['PREC']) 
-        INCAR.write("ALGO          =   %s\n" % self._params['ALGO'])
-        INCAR.write("ISTART        =   %i\n" % self._params['ISTART']) 
-        INCAR.write("ICHARG        =   %i\n" % self._params['ICHARG']) 
-        INCAR.write("ISIF          =   %i\n\n" % self._params['ISIF']) 
+        INCAR.write("SYSTEM        =   %s\n" % p['SYSTEM'])
+        INCAR.write("NPAR          =   %i\n" % int(p['NPAR']))
+        INCAR.write("IBRION        =   %i\n" % int(p['IBRION']))
+        INCAR.write("LWAVE         =   %s\n" % p['LWAVE']) 
+        INCAR.write("LCHARG        =   %s\n" % p['LCHARG']) 
+        INCAR.write("NSW           =   %i\n" % p['NSW']) 
+        INCAR.write("PREC          =   %s\n" % p['PREC']) 
+        INCAR.write("ALGO          =   %s\n" % p['ALGO'])
+        INCAR.write("ISTART        =   %i\n" % p['ISTART']) 
+        INCAR.write("ICHARG        =   %i\n" % p['ICHARG']) 
+        INCAR.write("ISIF          =   %i\n\n" % p['ISIF']) 
         INCAR.write("# VASP convergence parameters \n\n")
-        INCAR.write("ENCUT         =   %f\n" % float(self._params['ENCUT']))
-        INCAR.write("ISMEAR        =   %i\n" % self._params['ISMEAR'])
-        INCAR.write("SIGMA         =   %f\n" % self._params['SIGMA'])
-        INCAR.write("NSIM          =   %i\n" % self._params['NSIM'])
-        INCAR.write("NELMIN        =   %i\n" % self._params['NELMIN'])
-        INCAR.write("NELM          =   %i\n" % self._params['NELM'])
-        INCAR.write("EDIFF         =   %f\n" % float(self._params['EDIFF']))
-        INCAR.write("EDIFFG        =   %f\n" % float(self._params['EDIFFG']))
-        INCAR.write("%s           =   %s\n\n" % (self._params['XC'], self._params['XCAUTHOR']))
+        INCAR.write("ENCUT         =   %f\n" % float(p['ENCUT']))
+        INCAR.write("ISMEAR        =   %i\n" % p['ISMEAR'])
+        INCAR.write("SIGMA         =   %f\n" % p['SIGMA'])
+        INCAR.write("NSIM          =   %i\n" % p['NSIM'])
+        INCAR.write("NELMIN        =   %i\n" % p['NELMIN'])
+        INCAR.write("NELM          =   %i\n" % p['NELM'])
+        INCAR.write("EDIFF         =   %f\n" % float(p['EDIFF']))
+        INCAR.write("EDIFFG        =   %f\n" % float(p['EDIFFG']))
+        INCAR.write("%s           =   %s\n\n" % (p['XC'], p['XCAUTHOR']))
         INCAR.write("# VASP optional parameters \n\n")
-        INCAR.write("POTIM         =   %f\n" % float(self._params['POTIM']))
-        INCAR.write("IVDW          =   %i\n" % int(self._params['IVDW']))
-        INCAR.write("LDIPOL        =   %s\n" % self._params['LDIPOL'])
-        INCAR.write("IDIPOL        =   %i\n" % int(self._params['IDIPOL']))
-        INCAR.write("LPLANE        =   %s\n" % self._params['LPLANE'])
-        INCAR.write("ADDGRID       =   %s\n" % self._params['ADDGRID'])
-        INCAR.write("LREAL         =   %s\n" % self._params['LREAL'])
-        INCAR.write("ISYM          =   %i\n" % self._params['ISYM'])
-        INCAR.write("LASPH         =   %s\n" % self._params['LASPH'])
-        INCAR.write("LMAXMIX       =   %i\n" % self._params['LMAXMIX'])
-        INCAR.write("ISPIN         =   %i\n\n" % self._params['ISPIN'])
+        INCAR.write("POTIM         =   %f\n" % float(p['POTIM']))
+        INCAR.write("IVDW          =   %i\n" % int(p['IVDW']))
+        INCAR.write("LDIPOL        =   %s\n" % p['LDIPOL'])
+        INCAR.write("IDIPOL        =   %i\n" % int(p['IDIPOL']))
+        INCAR.write("LPLANE        =   %s\n" % p['LPLANE'])
+        INCAR.write("ADDGRID       =   %s\n" % p['ADDGRID'])
+        INCAR.write("LREAL         =   %s\n" % p['LREAL'])
+        INCAR.write("ISYM          =   %i\n" % p['ISYM'])
+        INCAR.write("LASPH         =   %s\n" % p['LASPH'])
+        INCAR.write("LMAXMIX       =   %i\n" % p['LMAXMIX'])
+        INCAR.write("ISPIN         =   %i\n\n" % p['ISPIN'])
         INCAR.close()
 
     def run_VASP(self, mode='single', nproc=1, npar=1, encut=400, kpoints=[1,1,1], 
@@ -274,35 +276,37 @@ class Vasp(object):
         --------
 
         from NanoCore import vasp2
-        from NanoCore import vasp_old
-        at = vasp_old.read_poscar('POSCAR')
+        from NanoCore import io 
+        at = io.read_poscar('POSCAR')
         at2 = vasp2.Vasp(at)
         at2.run_VASP(nproc=8, npar=2, kpoints=[2,2,1])
         
         """
         from NanoCore.env import vasp_calculator as executable
+
+        p = self._params
         
-        self._params['NPAR']       = npar
-        self._params['KPOINTS']    = kpoints
-        self._params['ENCUT']      = encut
-        self._params['EDIFF']      = ediff
-        self._params['EDIFFG']     = ediffg
+        p['NPAR']       = npar
+        p['KPOINTS']    = kpoints
+        p['ENCUT']      = encut
+        p['EDIFF']      = ediff
+        p['EDIFFG']     = ediffg
         
         if mode == 'opt':
-            self._params['IBRION'] = 2
-            self._params['POTIM']  = 0.300
-            self._params['NSW']    = 500
+            p['IBRION'] = 2
+            p['POTIM']  = 0.300
+            p['NSW']    = 500
         
         if mode == 'single':
-            self._params['IBRION'] = 2
-            self._params['POTIM']  = 0.300
-            self._params['NSW']    =   0
+            p['IBRION'] = 2
+            p['POTIM']  = 0.300
+            p['NSW']    =   0
 
         
         if mode == 'vib':
-            self._params['IBRION'] = 5
-            self._params['POTIM']  = 0.015
-            self._params['NSW']    = 1
+            p['IBRION'] = 5
+            p['POTIM']  = 0.015
+            p['NSW']    = 1
 
         # run_simulation
         cmd = 'mpirun -np %i %s > stdout.txt' % (nproc, executable)
@@ -368,8 +372,8 @@ class Vasp(object):
         """
         Example:
         --------
-        from NanoCore import vasp_old       
-        at = vasp_old.read_poscar('POSCAR')
+        from NanoCore import io       
+        at = io.read_poscar('POSCAR')
         at2 = vasp2.Vasp(at)
         at2.get_vibration_specctrum(output_name='OUTCAR_imag', matplot=1, start=-2000, end=6000)
         """
@@ -440,115 +444,113 @@ class Vasp(object):
         else:
             pass
  
-    def run_series_HER(self, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1], 
-                       ediff = 0.0001, ediffg = -0.05, fix=None, active=None, vib=1, label='test'):
+def run_series_HER(atoms, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1], 
+                   ediff = 0.0001, ediffg = -0.05, fix=None, active=None, vib=1, label='test'):
 
-        from NanoCore.catalysis import Modeling
-        
-        atoms = self.atoms
-        n_atoms = len(atoms)
-        atoms_HER = Vasp(atoms)
-        atoms_HER.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
-                                ediff=ediff, ediffg=ediffg, fix=fix)
-        
-        os.system('mv OUTCAR OUTCAR_%s_Sys' % label)
-        os.system('mv XDATCAR XDATCAR_%s_Sys' % label)
+    from NanoCore.catalysis import Modeling
+    
+    n_atoms = len(atoms)
+    atoms_HER = Vasp(atoms)
+    atoms_HER.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
+                            ediff=ediff, ediffg=ediffg, fix=fix)
+    
+    os.system('mv OUTCAR OUTCAR_%s_Sys' % label)
+    os.system('mv XDATCAR XDATCAR_%s_Sys' % label)
 
-        TE_Sys = atoms_HER.get_total_energy(output_name='OUTCAR_%s_Sys' % label)
+    TE_Sys = atoms_HER.get_total_energy(output_name='OUTCAR_%s_Sys' % label)
 
-        from NanoCore.vasp_old import read_poscar
+    from NanoCore.io import read_poscar
 
-        atoms_opt = read_poscar('CONTCAR')
-        atoms2 = Modeling(atoms_opt) 
-        atomsH = atoms2.HER_transition_gen(active=active)
-        
-        atomsH_HER = Vasp(atomsH)
-        atomsH_HER.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
-                                 ediff=ediff, ediffg=ediffg, fix=fix)
-        
-        os.system('mv OUTCAR OUTCAR_%s_SysH' % label)
-        os.system('mv XDATCAR XDATCAR_%s_SysH' % label)  
-
-        TE_SysH = atomsH_HER.get_total_energy(output_name='OUTCAR_%s_SysH' % label)
-
-        if vib:
-            atomsH_opt = read_poscar('CONTCAR')
-            
-            fix_vib = []
-            for i in range(n_atoms):
-                idx = i+1
-                fix_vib.append(idx)
-
-            atomsH_Vib = Vasp(atomsH_opt)
-            atomsH_Vib.run_VASP(mode='vib', nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
-                                     ediff=ediff, ediffg=ediffg, fix=fix_vib)
-
-            os.system('mv OUTCAR OUTCAR_%s_SysH_Vib' % label)
-            
-            ZPE, TS = atomsH_Vib.get_vibration_energy(output_name='OUTCAR_%s_SysH_Vib' % label)
-
-        if vib:
-            return float(TE_Sys), float(TE_SysH), float(ZPE), float(TS)
-        else:
-            return float(TE_Sys), float(TE_SysH)
-
-    def run_series_ORR(self, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1],                
-                    ediff = 0.0001, ediffg = -0.05, fix=None, active=None, vib=1, label='test'):
-                                                                                                 
-        from NanoCore.catalysis import Modeling
-     
-        System       = self.atoms
-        n_atoms      = len(System)
-        ORR_Sys      = Vasp(System)
-        ORR_Sys.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
+    atoms_opt = read_poscar('CONTCAR')
+    atoms2 = Modeling(atoms_opt) 
+    atomsH = atoms2.HER_transition_gen(active=active)
+    
+    atomsH_HER = Vasp(atomsH)
+    atomsH_HER.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
                              ediff=ediff, ediffg=ediffg, fix=fix)
-     
-        os.system('mv OUTCAR OUTCAR_%s_Sys' % label)
-        os.system('mv XDATCAR XDATCAR_%s_Sys' % label)
-        TE_ORR_Sys   = ORR_Sys.get_total_energy(output_name='OUTCAR_%s_Sys' % label)
-                                                                                                 
-        from NanoCore.vasp_old import read_poscar
-                                                                                                 
-        System_opt   = read_poscar('CONTCAR')
-        ORR_Sys_opt  = Modeling(System_opt)
-        
-        ORR_SysO2, ORR_SysOOH, ORR_SysO, ORR_SysOH = ORR_Sys_opt.four_electron_transition_gen(mode='ORR', active=active)
-        
-        #####
+    
+    os.system('mv OUTCAR OUTCAR_%s_SysH' % label)
+    os.system('mv XDATCAR XDATCAR_%s_SysH' % label)  
 
-        cal_target   = [ORR_SysO2, ORR_SysOOH, ORR_SysO, ORR_SysOH]
-        cal_name     = ['O2', 'OOH', 'O', 'OH']  
+    TE_SysH = atomsH_HER.get_total_energy(output_name='OUTCAR_%s_SysH' % label)
+
+    if vib:
+        atomsH_opt = read_poscar('CONTCAR')
         
-        TE           = [TE_ORR_Sys]
-        E_ZPE        = [float(0.000)]
-        E_TS         = [float(0.000)]
-        
-        fix_vib      = []
-        for j in range(n_atoms):
-            idx = j+1
+        fix_vib = []
+        for i in range(n_atoms):
+            idx = i+1
             fix_vib.append(idx)
 
-        for i in range(len(cal_target)):
-            cal = Vasp(cal_target[i])
-            cal.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
-                         ediff=ediff, ediffg=ediffg, fix=fix)
-            os.system('mv OUTCAR OUTCAR_%s_Sys%s'   % (label, cal_name[i]))
-            os.system('mv XDATCAR XDATCAR_%s_Sys%s' % (label, cal_name[i]))  
-            E = cal.get_total_energy(output_name='OUTCAR_%s_Sys%s' % (label, cal_name[i]))
-            TE.append(E)
+        atomsH_Vib = Vasp(atomsH_opt)
+        atomsH_Vib.run_VASP(mode='vib', nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
+                                 ediff=ediff, ediffg=ediffg, fix=fix_vib)
 
-            if vib:
-                cal_opt = read_poscar('CONTCAR')
-                cal_vib = Vasp(cal_opt)
-                cal_vib.run_VASP(mode='vib', nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
-                                   ediff=ediff, ediffg=ediffg, fix=fix_vib)
-                os.system('mv OUTCAR OUTCAR_%s_Sys%s_Vib' % (label, cal_name[i]))
-                ZPE, TS = cal_vib.get_vibration_energy(output_name='OUTCAR_%s_Sys%s_Vib' % (label, cal_name[i]))
-                E_ZPE.append(ZPE)
-                E_TS.append(TS)
-                                                                                                 
+        os.system('mv OUTCAR OUTCAR_%s_SysH_Vib' % label)
+        
+        ZPE, TS = atomsH_Vib.get_vibration_energy(output_name='OUTCAR_%s_SysH_Vib' % label)
+
+    if vib:
+        return float(TE_Sys), float(TE_SysH), float(ZPE), float(TS)
+    else:
+        return float(TE_Sys), float(TE_SysH)
+
+def run_series_ORR(atoms, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1],                
+                ediff = 0.0001, ediffg = -0.05, fix=None, active=None, vib=1, label='test'):
+                                                                                             
+    from NanoCore.catalysis import Modeling
+ 
+    n_atoms      = len(atoms)
+    ORR_Sys      = Vasp(atoms)
+    ORR_Sys.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
+                         ediff=ediff, ediffg=ediffg, fix=fix)
+ 
+    os.system('mv OUTCAR OUTCAR_%s_Sys' % label)
+    os.system('mv XDATCAR XDATCAR_%s_Sys' % label)
+    TE_ORR_Sys   = ORR_Sys.get_total_energy(output_name='OUTCAR_%s_Sys' % label)
+                                                                                             
+    from NanoCore.io import read_poscar
+                                                                                             
+    System_opt   = read_poscar('CONTCAR')
+    ORR_Sys_opt  = Modeling(System_opt)
+    
+    ORR_SysO2, ORR_SysOOH, ORR_SysO, ORR_SysOH = ORR_Sys_opt.four_electron_transition_gen(mode='ORR', active=active)
+    
+    #####
+
+    cal_target   = [ORR_SysO2, ORR_SysOOH, ORR_SysO, ORR_SysOH]
+    cal_name     = ['O2', 'OOH', 'O', 'OH']  
+    
+    TE           = [TE_ORR_Sys]
+    E_ZPE        = [float(0.000)]
+    E_TS         = [float(0.000)]
+    
+    fix_vib      = []
+    for j in range(n_atoms):
+        idx = j+1
+        fix_vib.append(idx)
+
+    for i in range(len(cal_target)):
+        cal = Vasp(cal_target[i])
+        cal.run_VASP(mode=mode, nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
+                     ediff=ediff, ediffg=ediffg, fix=fix)
+        os.system('mv OUTCAR OUTCAR_%s_Sys%s'   % (label, cal_name[i]))
+        os.system('mv XDATCAR XDATCAR_%s_Sys%s' % (label, cal_name[i]))  
+        E = cal.get_total_energy(output_name='OUTCAR_%s_Sys%s' % (label, cal_name[i]))
+        TE.append(E)
+
         if vib:
-            return TE, E_ZPE, E_TS
-        else:
-            return TE
+            cal_opt = read_poscar('CONTCAR')
+            cal_vib = Vasp(cal_opt)
+            cal_vib.run_VASP(mode='vib', nproc=nproc, npar=npar, encut=encut, kpoints=kpoints, \
+                               ediff=ediff, ediffg=ediffg, fix=fix_vib)
+            os.system('mv OUTCAR OUTCAR_%s_Sys%s_Vib' % (label, cal_name[i]))
+            ZPE, TS = cal_vib.get_vibration_energy(output_name='OUTCAR_%s_Sys%s_Vib' % (label, cal_name[i]))
+            E_ZPE.append(ZPE)
+            E_TS.append(TS)
+                                                                                             
+    if vib:
+        return TE, E_ZPE, E_TS
+    else:
+        return TE
 

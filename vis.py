@@ -1,5 +1,5 @@
 import os, glob, re
-from io import write_xsf, write_pdb
+from .io import write_xsf, write_pdb
 
 def show_xcrysden(atoms, reset=False, **options):
     
@@ -22,7 +22,7 @@ def show_xcrysden(atoms, reset=False, **options):
     if files == []:
         pass
     else:
-	n2 = []
+        n2 = []
         for i in files:
             n1 = re.findall('\d+', i)
             n2 += n1
@@ -67,7 +67,7 @@ def write_xsf_script(xsf_name, tcl_name=None, **options):
         xs_full_screen(tcl_name)
 
 def xs_load(xsf_name,tcl_name):
-    f = file(tcl_name, "w")
+    f = open(tcl_name, "w")
     f.write("scripting::open --xsf %s\n" % xsf_name)
     f.write("scripting::display on crystal-cells\n")
     f.write("scripting::display on coordinate-system\n")
@@ -79,19 +79,19 @@ def xs_load(xsf_name,tcl_name):
     f.close()
 
 def xs_rotate(tcl_name, rot_opts):
-    f = file(tcl_name, 'a')
-    print rot_opts
+    f = open(tcl_name, 'a')
+    print(rot_opts)
     for opt in rot_opts:
-        print opt[0],opt[1]
+        print(opt[0],opt[1])
         f.write("scripting::rotate %s %s\n" % (opt[0],opt[1]))
     f.close()
 
 def xs_zoom(tcl_name, magn):
-    f = file(tcl_name, 'a')
+    f = open(tcl_name, 'a')
     f.write("scripting::zoom %s \n" % magn)
     f.close()
 
 def xs_full_screen(tcl_name):
-    f = file(tcl_name, 'a')
+    f = open(tcl_name, 'a')
     f.write("scripting::displayWindow fullscreen\n")
     f.close()
