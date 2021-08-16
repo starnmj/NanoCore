@@ -554,3 +554,207 @@ def run_series_ORR(atoms, mode='opt', nproc=1, npar=1, encut=400, kpoints=[1,1,1
     else:
         return TE
 
+def pdos_split_sum(sum_list=[1]):
+    
+    line_info, word_info = Vasp.file_read('DOSCAR')
+    n_points = int(word_info[5][2])
+    E_fermi  = float(word_info[5][3])
+
+    ### Data list (s, p, d + spin) ###
+    s_up     = []   ;    s_dn   = []
+    py_up    = []   ;    py_dn  = []
+    pz_up    = []   ;    pz_dn  = []
+    px_up    = []   ;    px_dn  = []
+    dxy_up   = []   ;    dxy_dn = []
+    dyz_up   = []   ;    dyz_dn = []
+    dz2_up   = []   ;    dz2_dn = []
+    dxz_up   = []   ;    dxz_dn = []
+    dx2_up   = []   ;    dx2_dn = []
+    s_up_sum = []   ;  s_dn_sum = []
+    p_up_sum = []   ;  p_dn_sum = []
+    d_up_sum = []   ;  d_dn_sum = []
+    ###
+
+    E_modi = []
+    for i in range(len(word_info)):
+        if len(word_info[i]) == 19: # only for the s,p,d + spin case
+            item = word_info[i]
+            E_modi.append(float(item[0])-E_fermi)
+            s_up.append(float(item[1]))
+            s_dn.append(-float(item[2]))
+            py_up.append(float(item[3]))
+            py_dn.append(-float(item[4]))
+            pz_up.append(float(item[5]))
+            pz_dn.append(-float(item[6]))
+            px_up.append(float(item[7]))
+            px_dn.append(-float(item[8]))
+            dxy_up.append(float(item[9]))
+            dxy_dn.append(-float(item[10]))
+            dyz_up.append(float(item[11]))
+            dyz_dn.append(-float(item[12]))
+            dz2_up.append(float(item[13]))
+            dz2_dn.append(-float(item[14]))
+            dxz_up.append(float(item[15]))
+            dxz_dn.append(-float(item[16]))
+            dx2_up.append(float(item[17]))
+            dx2_dn.append(-float(item[18]))
+
+    N_atoms = len(E_modi) / n_points # double check
+
+    # write arranged data
+
+    for i in range(int(N_atoms)):
+        dataDOS = open('%03d_ATOM.dat' % int(i+1), 'w')
+        for j in range(n_points):
+            char = "%15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f" % (E_modi[i*n_points+j],s_up[i*n_points+j]+py_up[i*n_points+j]+pz_up[i*n_points+j]+px_up[i*n_points+j]+dxy_up[i*n_points+j]+dyz_up[i*n_points+j]+dz2_up[i*n_points+j]+dxz_up[i*n_points+j]+dx2_up[i*n_points+j],s_dn[i*n_points+j]+py_dn[i*n_points+j]+pz_dn[i*n_points+j]+px_dn[i*n_points+j]+dxy_dn[i*n_points+j]+dyz_dn[i*n_points+j]+dz2_dn[i*n_points+j]+dxz_dn[i*n_points+j]+dx2_dn[i*n_points+j],s_up[i*n_points+j],s_dn[i*n_points+j],py_up[i*n_points+j]+pz_up[i*n_points+j]+px_up[i*n_points+j],py_dn[i*n_points+j]+pz_dn[i*n_points+j]+px_dn[i*n_points+j],dxy_up[i*n_points+j]+dyz_up[i*n_points+j]+dz2_up[i*n_points+j]+dxz_up[i*n_points+j]+dx2_up[i*n_points+j],dxy_dn[i*n_points+j]+dyz_dn[i*n_points+j]+dz2_dn[i*n_points+j]+dxz_dn[i*n_points+j]+dx2_dn[i*n_points+j],s_up[i*n_points+j],s_dn[i*n_points+j],py_up[i*n_points+j],py_dn[i*n_points+j],pz_up[i*n_points+j],pz_dn[i*n_points+j],px_up[i*n_points+j],px_dn[i*n_points+j],dxy_up[i*n_points+j],dxy_dn[i*n_points+j],dyz_up[i*n_points+j],dyz_dn[i*n_points+j],dz2_up[i*n_points+j],dz2_dn[i*n_points+j],dxz_up[i*n_points+j],dxz_dn[i*n_points+j],dx2_up[i*n_points+j],dx2_dn[i*n_points+j])    
+            dataDOS.write(char)
+            dataDOS.write("\n")
+        dataDOS.close()
+    
+    os.system('mkdir PDOS')
+    os.system('mv *_ATOM.dat PDOS')
+    
+    ### Sum data list (s, p, d + spin) ###   
+    sum_s_up     = []   ;    sum_s_dn     = []     
+    sum_py_up    = []   ;    sum_py_dn    = []
+    sum_pz_up    = []   ;    sum_pz_dn    = []
+    sum_px_up    = []   ;    sum_px_dn    = []
+    sum_dxy_up   = []   ;    sum_dxy_dn   = []
+    sum_dyz_up   = []   ;    sum_dyz_dn   = []
+    sum_dz2_up   = []   ;    sum_dz2_dn   = []
+    sum_dxz_up   = []   ;    sum_dxz_dn   = []
+    sum_dx2_up   = []   ;    sum_dx2_dn   = []
+    sum_s_up_sum = []   ;    sum_s_dn_sum = []
+    sum_p_up_sum = []   ;    sum_p_dn_sum = []
+    sum_d_up_sum = []   ;    sum_d_dn_sum = []
+    ###
+    
+    for j in range(n_points):
+        num_s_up   = 0   ;   num_s_dn   = 0
+        num_py_up  = 0   ;   num_py_dn  = 0
+        num_pz_up  = 0   ;   num_pz_dn  = 0
+        num_px_up  = 0   ;   num_px_dn  = 0
+        num_dxy_up = 0   ;   num_dxy_dn = 0
+        num_dyz_up = 0   ;   num_dyz_dn = 0
+        num_dz2_up = 0   ;   num_dz2_dn = 0
+        num_dxz_up = 0   ;   num_dxz_dn = 0
+        num_dx2_up = 0   ;   num_dx2_dn = 0
+        num_s_up_sum = 0 ;   num_s_dn_sum = 0
+        num_p_up_sum = 0 ;   num_p_dn_sum = 0
+        num_d_up_sum = 0 ;   num_d_dn_sum = 0
+        for i in sum_list:
+            # each orbitals
+            num_s_up += s_up[(i-1)*n_points+j]       ;  num_s_dn += s_dn[(i-1)*n_points+j]
+            num_py_up += py_up[(i-1)*n_points+j]     ;  num_py_dn += py_dn[(i-1)*n_points+j]
+            num_pz_up += pz_up[(i-1)*n_points+j]     ;  num_pz_dn += pz_dn[(i-1)*n_points+j]
+            num_px_up += px_up[(i-1)*n_points+j]     ;  num_px_dn += px_dn[(i-1)*n_points+j]
+            num_dxy_up += dxy_up[(i-1)*n_points+j]   ;  num_dxy_dn += dxy_dn[(i-1)*n_points+j]
+            num_dyz_up += dyz_up[(i-1)*n_points+j]   ;  num_dyz_dn += dyz_dn[(i-1)*n_points+j]
+            num_dz2_up += dz2_up[(i-1)*n_points+j]   ;  num_dz2_dn += dz2_dn[(i-1)*n_points+j]
+            num_dxz_up += dxz_up[(i-1)*n_points+j]   ;  num_dxz_dn += dxz_dn[(i-1)*n_points+j]
+            num_dx2_up += dx2_up[(i-1)*n_points+j]   ;  num_dx2_dn += dx2_dn[(i-1)*n_points+j]
+            # each summed orbitals
+            num_s_up_sum += s_up[(i-1)*n_points+j]   
+            num_s_dn_sum += s_dn[(i-1)*n_points+j]
+            num_p_up_sum += py_up[(i-1)*n_points+j] + pz_up[(i-1)*n_points+j] + px_up[(i-1)*n_points+j]
+            num_p_dn_sum += py_dn[(i-1)*n_points+j] + pz_dn[(i-1)*n_points+j] + px_dn[(i-1)*n_points+j]
+            num_d_up_sum += dxy_up[(i-1)*n_points+j] + dyz_up[(i-1)*n_points+j] + dz2_up[(i-1)*n_points+j] + dxz_up[(i-1)*n_points+j] + dx2_up[(i-1)*n_points+j]
+            num_d_dn_sum += dxy_dn[(i-1)*n_points+j] + dyz_dn[(i-1)*n_points+j] + dz2_dn[(i-1)*n_points+j] + dxz_dn[(i-1)*n_points+j] + dx2_dn[(i-1)*n_points+j]
+        # summation values
+        sum_s_up.append(num_s_up)         ;   sum_s_dn.append(num_s_dn)
+        sum_py_up.append(num_py_up)       ;   sum_py_dn.append(num_py_dn)
+        sum_pz_up.append(num_pz_up)       ;   sum_pz_dn.append(num_pz_dn)
+        sum_px_up.append(num_px_up)       ;   sum_px_dn.append(num_px_dn)
+        sum_dxy_up.append(num_dxy_up)     ;   sum_dxy_dn.append(num_dxy_dn)
+        sum_dyz_up.append(num_dyz_up)     ;   sum_dyz_dn.append(num_dyz_dn)
+        sum_dz2_up.append(num_dz2_up)     ;   sum_dz2_dn.append(num_dz2_dn)
+        sum_dxz_up.append(num_dxz_up)     ;   sum_dxz_dn.append(num_dxz_dn)
+        sum_dx2_up.append(num_dx2_up)     ;   sum_dx2_dn.append(num_dx2_dn)
+        sum_s_up_sum.append(num_s_up_sum) ;   sum_s_dn_sum.append(num_s_dn_sum)
+        sum_p_up_sum.append(num_p_up_sum) ;   sum_p_dn_sum.append(num_p_dn_sum)
+        sum_d_up_sum.append(num_d_up_sum) ;   sum_d_dn_sum.append(num_d_dn_sum)
+    dataSUMDOS = open('SUM_ATOM.dat', 'w')
+    for i in range(n_points):
+        char = "%15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f %15.8f" % (E_modi[i],sum_s_up_sum[i]+sum_p_up_sum[i]+sum_d_up_sum[i],sum_s_dn_sum[i]+sum_p_dn_sum[i]+sum_d_dn_sum[i],sum_s_up_sum[i],sum_s_dn_sum[i],sum_p_up_sum[i],sum_p_dn_sum[i],sum_d_up_sum[i],sum_d_dn_sum[i],sum_s_up[i],sum_s_dn[i],sum_py_up[i],sum_py_dn[i],sum_pz_up[i],sum_pz_dn[i],sum_px_up[i],sum_px_dn[i],sum_dxy_up[i],sum_dxy_dn[i],sum_dyz_up[i],sum_dyz_dn[i],sum_dz2_up[i],sum_dz2_dn[i],sum_dxz_up[i],sum_dxz_dn[i],sum_dx2_up[i],sum_dx2_dn[i])
+        dataSUMDOS.write(char)
+        dataSUMDOS.write("\n")
+    dataSUMDOS.close()
+    os.system('mv SUM_ATOM.dat PDOS')
+
+def pdos_orbital_analysis(fname='SUM_ATOM.dat', orbitals=1):
+    '''
+    d-band center theory : Nature, 376, 238 (1995)
+    Fermi abundance      : J. Phys. Chem. C 121, 1530 (2017)
+    highest peak         : Nat. Energy, 1, 16130 (2016)
+    '''
+    import os, sys, math
+    import numpy as np
+    from scipy.misc import derivative
+ 
+    def fermi_dirac(E, fermi=0, T=298.15):
+        return 1 / (1 + np.exp((E - fermi) / 0.4))
+
+    def d_fd(E):
+        deri_fd = derivative(fermi_dirac, E, dx=1e-6)
+        return deri_fd
+
+    def find_index(data, target):
+        res = []
+        lis = data
+        while True:
+            try:
+                res.append(lis.index(target) + (res[-1]+1 if len(res)!=0 else 0))
+                lis = data[res[-1]+1:]
+            except:
+                break
+        return res
+    
+    line_info, word_info = Vasp.file_read(fname)
+    
+    E = [] ; Orb = []
+    
+    for i in range(len(word_info)):
+        E.append(float(word_info[i][0]))
+        Orb.append(float(word_info[i][orbitals]))
+
+    for i in range(len(E)-1):
+        if E[i+1] * E[i] < 0 or E[i+1] * E[i] == 0:
+            Fermi_idx = i
+        else:
+            pass
+    
+    # find parameteres
+    dE = E[1] - E[0]
+    n_Orb = 0 ; E_n_Orb = 0
+    df_n_Orb = 0 ; df_E_n_Orb = 0
+    
+    Orb_Ef = Orb[:Fermi_idx]
+    if sum(Orb_Ef) >= 0:
+        Orb_max = max(Orb_Ef) 
+    elif sum(Orb_Ef) < 0:
+        Orb_max = min(Orb_Ef)
+    else:
+        print("The data is not consistent for spin up or dn")
+    
+    E_Orb_max = find_index(Orb_Ef, Orb_max)
+
+    if len(E_Orb_max) == 1:
+        E_max = E[E_Orb_max[0]]
+    else:
+        print("Same max values exist")
+
+    # calculation 
+    for i in range(Fermi_idx):
+        n_Orb       = n_Orb      + dE * Orb_Ef[i]
+        E_n_Orb     = E_n_Orb    + dE * Orb_Ef[i] * E[i]
+        df_n_Orb    = df_n_Orb   + dE * Orb_Ef[i] * d_fd(E[i])
+        df_E_n_Orb  = df_E_n_Orb + dE * Orb_Ef[i] * E[i] * d_fd(E[i])
+
+    Orb_cent = E_n_Orb / n_Orb
+    Ef_abund = df_E_n_Orb / df_n_Orb
+    print('orbital center', Orb_cent)
+    print('fermi-abudnace', Ef_abund)
+    print('highest peak', E_max,'at', E_Orb_max)
+    
+    return Orb_cent, Ef_abund, (E_max, Orb_Ef[E_Orb_max[0]])
+
